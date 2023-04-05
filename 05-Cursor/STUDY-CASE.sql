@@ -1,0 +1,31 @@
+DECLARE
+    V_TOTAL_SAL       NUMBER := 0;
+    V_TOTAL_EMP       NUMBER := 0;
+    V_RESULT          NUMBER := 0;
+    V_DEPARTMENT_ID   DEPARTMENTS.DEPARTMENT_ID%TYPE;
+    V_DEPARTMENT_NAME DEPARTMENTS.DEPARTMENT_NAME%TYPE;
+    CURSOR C_DEP IS
+        SELECT DEPARTMENT_ID, DEPARTMENT_NAME
+        FROM DEPARTMENTS;
+BEGIN
+    OPEN C_DEP;
+    LOOP
+        FETCH C_DEP INTO V_DEPARTMENT_ID, V_DEPARTMENT_NAME;
+        EXIT WHEN C_DEP%NOTFOUND;
+        V_TOTAL_EMP := 0;
+        V_TOTAL_SAL := 0;
+        V_RESULT := 0;
+        FOR V_EMP IN (SELECT SALARY FROM EMPLOYEES WHERE DEPARTMENT_ID = V_DEPARTMENT_ID)
+            LOOP
+                V_TOTAL_SAL := V_TOTAL_SAL + V_EMP.SALARY;
+                V_TOTAL_EMP := V_TOTAL_EMP + 1;
+            end loop;
+        IF (V_TOTAL_EMP <> 0) THEN
+            V_RESULT := V_TOTAL_SAL / V_TOTAL_EMP;
+        end if;
+        DBMS_OUTPUT.PUT_LINE('Department : ' || V_DEPARTMENT_NAME);
+        DBMS_OUTPUT.PUT_LINE('Average Salary : ' || ROUND(V_RESULT,2));
+        DBMS_OUTPUT.PUT_LINE('==========================');
+    end loop;
+    CLOSE C_DEP;
+end ;
